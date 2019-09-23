@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cloudformation Stack
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+  DBDriverName:
+    Type: String
+    Default: ''
+  DBDataSourceName:
+    Type: String
+    Default: ''
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 15
+    Runtime: go1.x
+    Environment:
+      Variables:
+        Stage: !Ref Stage
+        DBDriverName: !Ref DBDriverName
+        DBDataSourceName: !Ref DBDataSourceName
+        ApiGatewayEndpoint: !Ref ApiGatewayEndpoint
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-LambdaRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Ref AWS::StackName
+      StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
+        AllowOrigin: "'*'"
+
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-HelloWorld'
+      CodeUri: bin/hello-world
+      Handler: hello-world
+      Role: !GetAtt
+        - LambdaExecutionRole
+        - Arn
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: GET
+            RestApiId: !Ref RestApi
+
+  UserListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-UserList'
+      CodeUri: bin/user-list
+      Handler: user-list
+      Role: !GetAtt
+        - LambdaExecutionRole
+        - Arn
+      Events:
+        UserList:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: GET
+            RestApiId: !Ref RestApi
+
+  UserCreateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-UserCreate'
+      CodeUri: bin/user-create
+      Handler: user-create
+      Role: !GetAtt
+        - LambdaExecutionRole
+        - Arn
+      Events:
+        UserCreate:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: POST
+            RestApiId: !Ref RestApi
+
+Outputs:
+  ApiGatewayInvokeURL:
+    Value: !Sub 'https://${RestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}'

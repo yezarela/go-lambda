@@ -1,0 +1,14 @@
+# Env
+env.prod
+
+# Outputs
+bin
+packaged-*.yaml
+cloudformation-meta-dev.json
+
+# Dependencies
+vendor
+
+# Misc
+.DS_STORE
+.idea/

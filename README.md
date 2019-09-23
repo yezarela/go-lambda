@@ -1,6 +1,6 @@
 # Go Lambda
 
-Go architecture for serverless lambda functions
+Go architecture for AWS Lambda 
 
 ## Requirements
 

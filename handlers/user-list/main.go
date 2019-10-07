@@ -17,8 +17,8 @@ var userUsecase *user.Usecase
 
 func init() {
 	db := core.OpenSQLConnection()
-	userRepo := user.NewUserRepository(db)
-	userUsecase = user.NewUserUsecase(db, userRepo)
+	userRepo := user.NewRepository(db)
+	userUsecase = user.NewUsecase(db, userRepo)
 }
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {

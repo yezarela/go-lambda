@@ -18,8 +18,8 @@ var userUsecase *user.Usecase
 
 func init() {
 	db := core.OpenSQLConnection()
-	userRepo := user.NewUserRepository(db)
-	userUsecase = user.NewUserUsecase(db, userRepo)
+	userRepo := user.NewRepository(db)
+	userUsecase = user.NewUsecase(db, userRepo)
 }
 
 type params struct {

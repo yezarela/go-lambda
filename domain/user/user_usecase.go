@@ -4,18 +4,19 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/pkg/errors"
 	"github.com/yezarela/go-lambda/models"
 	"github.com/yezarela/go-lambda/pkg/utils"
 )
 
-// Usecase represent the user's usecases
+// Usecase ...
 type Usecase struct {
 	db       *sql.DB
-	userRepo Repository
+	userRepo *Repository
 }
 
-// NewUserUsecase will create new Usecase object
-func NewUserUsecase(db *sql.DB, r Repository) *Usecase {
+// NewUsecase ...
+func NewUsecase(db *sql.DB, r *Repository) *Usecase {
 	return &Usecase{
 		db:       db,
 		userRepo: r,
@@ -24,6 +25,8 @@ func NewUserUsecase(db *sql.DB, r Repository) *Usecase {
 
 // ListUser ...
 func (m *Usecase) ListUser(ctx context.Context, params ...ListUserParams) ([]*models.User, error) {
+	op := "user.Usecase.ListUser"
+
 	param := ListUserParams{
 		SortBy:        "date",
 		SortDirection: "desc",
@@ -40,7 +43,7 @@ func (m *Usecase) ListUser(ctx context.Context, params ...ListUserParams) ([]*mo
 
 	res, err := m.userRepo.ListUser(ctx, param)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 
 	return res, nil
@@ -48,10 +51,11 @@ func (m *Usecase) ListUser(ctx context.Context, params ...ListUserParams) ([]*mo
 
 // GetByID ...
 func (m *Usecase) GetByID(ctx context.Context, id uint) (*models.User, error) {
+	op := "user.Usecase.GetByID"
 
 	res, err := m.userRepo.GetUser(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 
 	return res, nil
@@ -59,28 +63,29 @@ func (m *Usecase) GetByID(ctx context.Context, id uint) (*models.User, error) {
 
 // CreateUser ...
 func (m *Usecase) CreateUser(ctx context.Context, p *models.User) (*models.User, error) {
+	op := "user.Usecase.CreateUser"
 
 	// Start transaction
 	tx, err := m.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 	defer tx.Rollback()
 
 	id, err := m.userRepo.CreateUser(ctx, tx, p)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 
 	// Commit transactions / end
 	err = tx.Commit()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 
 	res, err := m.userRepo.GetUser(ctx, uint(id))
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 
 	return res, nil
@@ -88,23 +93,24 @@ func (m *Usecase) CreateUser(ctx context.Context, p *models.User) (*models.User,
 
 // UpdateUser ...
 func (m *Usecase) UpdateUser(ctx context.Context, p *models.User) (*models.User, error) {
+	op := "user.Usecase.UpdateUser"
 
 	// Start transaction
 	tx, err := m.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 	defer tx.Rollback()
 
 	res, err := m.userRepo.UpdateUser(ctx, tx, p)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 
 	// Commit transactions / end
 	err = tx.Commit()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 
 	return res, nil
@@ -112,10 +118,11 @@ func (m *Usecase) UpdateUser(ctx context.Context, p *models.User) (*models.User,
 
 // DeleteUser ...
 func (m *Usecase) DeleteUser(ctx context.Context, id uint) error {
+	op := "user.Usecase.DeleteUser"
 
 	existedUser, err := m.userRepo.GetUser(ctx, id)
 	if err != nil {
-		return err
+		return errors.Wrap(err, op)
 	}
 	if existedUser == nil {
 		return models.ErrNotFound

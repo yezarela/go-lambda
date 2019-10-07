@@ -5,31 +5,26 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/pkg/errors"
 	"github.com/yezarela/go-lambda/models"
 )
 
-// Repository represent the user's repository
-type Repository interface {
-	ListUser(ctx context.Context, p ListUserParams) ([]*models.User, error)
-	GetUser(ctx context.Context, id uint) (*models.User, error)
-	CreateUser(ctx context.Context, tx *sql.Tx, p *models.User) (int64, error)
-	UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User) (*models.User, error)
-	DeleteUser(ctx context.Context, id uint) error
-}
-
-type userRepository struct {
+// Repository ...
+type Repository struct {
 	db *sql.DB
 }
 
-// NewUserRepository will create an object that represent the Repository interface
-func NewUserRepository(db *sql.DB) Repository {
-	return &userRepository{db}
+// NewRepository ...
+func NewRepository(db *sql.DB) *Repository {
+	return &Repository{db}
 }
 
-func (m *userRepository) fetchUser(ctx context.Context, query string, args ...interface{}) ([]*models.User, error) {
+func (m *Repository) fetchUser(ctx context.Context, query string, args ...interface{}) ([]*models.User, error) {
+	op := "user.Repository.fetchUser"
+
 	rows, err := m.db.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 	defer rows.Close()
 
@@ -45,7 +40,7 @@ func (m *userRepository) fetchUser(ctx context.Context, query string, args ...in
 			&s.UpdatedAt,
 		)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, op)
 		}
 
 		data := &models.User{}
@@ -66,7 +61,8 @@ type ListUserParams struct {
 }
 
 // ListUser ...
-func (m *userRepository) ListUser(ctx context.Context, param ListUserParams) ([]*models.User, error) {
+func (m *Repository) ListUser(ctx context.Context, param ListUserParams) ([]*models.User, error) {
+	op := "user.Repository.ListUser"
 
 	switch param.SortBy {
 	case "date":
@@ -91,18 +87,19 @@ func (m *userRepository) ListUser(ctx context.Context, param ListUserParams) ([]
 
 	items, err := m.fetchUser(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 
 	return items, nil
 }
 
 // GetUser ...
-func (m *userRepository) GetUser(ctx context.Context, id uint) (*models.User, error) {
+func (m *Repository) GetUser(ctx context.Context, id uint) (*models.User, error) {
+	op := "user.Repository.GetUser"
 
 	rows, err := m.fetchUser(ctx, getUserQuery, id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 
 	if len(rows) > 0 {
@@ -113,11 +110,12 @@ func (m *userRepository) GetUser(ctx context.Context, id uint) (*models.User, er
 }
 
 // CreateUser ...
-func (m *userRepository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.User) (int64, error) {
+func (m *Repository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.User) (int64, error) {
+	op := "user.Repository.CreateUser"
 
 	stmt, err := tx.PrepareContext(ctx, createUserQuery)
 	if err != nil {
-		return -1, err
+		return -1, errors.Wrap(err, op)
 	}
 	defer stmt.Close()
 
@@ -126,18 +124,19 @@ func (m *userRepository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.U
 		p.Email,
 	)
 	if err != nil {
-		return -1, err
+		return -1, errors.Wrap(err, op)
 	}
 
 	return res.LastInsertId()
 }
 
 // UpdateUser ...
-func (m *userRepository) UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User) (*models.User, error) {
+func (m *Repository) UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User) (*models.User, error) {
+	op := "user.Repository.UpdateUser"
 
 	stmt, err := tx.PrepareContext(ctx, updateUserQuery)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 	defer stmt.Close()
 
@@ -146,24 +145,25 @@ func (m *userRepository) UpdateUser(ctx context.Context, tx *sql.Tx, p *models.U
 		p.Email,
 	)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, op)
 	}
 
 	return p, nil
 }
 
 // DeleteUser ...
-func (m *userRepository) DeleteUser(ctx context.Context, id uint) error {
+func (m *Repository) DeleteUser(ctx context.Context, id uint) error {
+	op := "user.Repository.DeleteUser"
 
 	stmt, err := m.db.PrepareContext(ctx, deleteUserQuery)
 	if err != nil {
-		return err
+		return errors.Wrap(err, op)
 	}
 	defer stmt.Close()
 
 	_, err = stmt.ExecContext(ctx, id)
 	if err != nil {
-		return err
+		return errors.Wrap(err, op)
 	}
 
 	return nil

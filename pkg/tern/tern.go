@@ -1,3 +1,4 @@
+// Package tern implements ternary-like operator
 package tern
 
 // String returns non nil value if available

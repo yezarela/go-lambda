@@ -1,4 +1,4 @@
-package core
+package conn
 
 import (
 	"database/sql"
@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-// OpenSQLConnection creates sql connection
-func OpenSQLConnection() *sql.DB {
+// NewSQLConnection creates sql connection
+func NewSQLConnection() *sql.DB {
 	dbDriver := os.Getenv("DBDriverName")
 	dbSource := os.Getenv("DBDataSourceName")
 

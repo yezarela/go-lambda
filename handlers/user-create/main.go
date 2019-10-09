@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/yezarela/go-lambda/domain/user"
 	"github.com/yezarela/go-lambda/models"
-	"github.com/yezarela/go-lambda/pkg/core"
+	"github.com/yezarela/go-lambda/pkg/conn"
 	"github.com/yezarela/go-lambda/pkg/validator"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -17,7 +17,7 @@ import (
 var userUsecase *user.Usecase
 
 func init() {
-	db := core.OpenSQLConnection()
+	db := conn.NewSQLConnection()
 	userRepo := user.NewRepository(db)
 	userUsecase = user.NewUsecase(db, userRepo)
 }

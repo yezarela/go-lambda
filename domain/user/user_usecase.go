@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/yezarela/go-lambda/models"
-	"github.com/yezarela/go-lambda/pkg/utils"
+	"github.com/yezarela/go-lambda/pkg/tern"
 )
 
 // Usecase ...
@@ -35,10 +35,10 @@ func (m *Usecase) ListUser(ctx context.Context, params ...ListUserParams) ([]*mo
 	}
 
 	if p := params[0]; len(params) > 0 {
-		param.SortBy = utils.Strdef(p.SortBy, param.SortBy)
-		param.SortDirection = utils.Strdef(p.SortDirection, param.SortDirection)
-		param.Limit = utils.Uintdef(p.Limit, param.Limit)
-		param.Offset = utils.Uintdef(p.Offset, param.Offset)
+		param.SortBy = tern.String(p.SortBy, param.SortBy)
+		param.SortDirection = tern.String(p.SortDirection, param.SortDirection)
+		param.Limit = tern.Uint(p.Limit, param.Limit)
+		param.Offset = tern.Uint(p.Offset, param.Offset)
 	}
 
 	res, err := m.userRepo.ListUser(ctx, param)

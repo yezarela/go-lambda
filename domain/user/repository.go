@@ -10,16 +10,24 @@ import (
 )
 
 // Repository ...
-type Repository struct {
+type Repository interface {
+	ListUser(ctx context.Context, p ListUserParams) ([]*models.User, error)
+	GetUser(ctx context.Context, id uint) (*models.User, error)
+	CreateUser(ctx context.Context, tx *sql.Tx, p *models.User) (int64, error)
+	UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User) (*models.User, error)
+	DeleteUser(ctx context.Context, id uint) error
+}
+
+type repository struct {
 	db *sql.DB
 }
 
 // NewRepository ...
-func NewRepository(db *sql.DB) *Repository {
-	return &Repository{db}
+func NewRepository(db *sql.DB) Repository {
+	return &repository{db}
 }
 
-func (m *Repository) fetchUser(ctx context.Context, query string, args ...interface{}) ([]*models.User, error) {
+func (m *repository) fetchUser(ctx context.Context, query string, args ...interface{}) ([]*models.User, error) {
 	op := "user.Repository.fetchUser"
 
 	rows, err := m.db.QueryContext(ctx, query, args...)
@@ -61,7 +69,7 @@ type ListUserParams struct {
 }
 
 // ListUser ...
-func (m *Repository) ListUser(ctx context.Context, param ListUserParams) ([]*models.User, error) {
+func (m *repository) ListUser(ctx context.Context, param ListUserParams) ([]*models.User, error) {
 	op := "user.Repository.ListUser"
 
 	switch param.SortBy {
@@ -94,10 +102,10 @@ func (m *Repository) ListUser(ctx context.Context, param ListUserParams) ([]*mod
 }
 
 // GetUser ...
-func (m *Repository) GetUser(ctx context.Context, id uint) (*models.User, error) {
+func (m *repository) GetUser(ctx context.Context, id uint) (*models.User, error) {
 	op := "user.Repository.GetUser"
 
-	rows, err := m.fetchUser(ctx, getUserQuery, id)
+	rows, err := m.fetchUser(ctx, GetUserQuery, id)
 	if err != nil {
 		return nil, errors.Wrap(err, op)
 	}
@@ -110,7 +118,7 @@ func (m *Repository) GetUser(ctx context.Context, id uint) (*models.User, error)
 }
 
 // CreateUser ...
-func (m *Repository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.User) (int64, error) {
+func (m *repository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.User) (int64, error) {
 	op := "user.Repository.CreateUser"
 
 	stmt, err := tx.PrepareContext(ctx, createUserQuery)
@@ -131,7 +139,7 @@ func (m *Repository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.User)
 }
 
 // UpdateUser ...
-func (m *Repository) UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User) (*models.User, error) {
+func (m *repository) UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User) (*models.User, error) {
 	op := "user.Repository.UpdateUser"
 
 	stmt, err := tx.PrepareContext(ctx, updateUserQuery)
@@ -152,7 +160,7 @@ func (m *Repository) UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User)
 }
 
 // DeleteUser ...
-func (m *Repository) DeleteUser(ctx context.Context, id uint) error {
+func (m *repository) DeleteUser(ctx context.Context, id uint) error {
 	op := "user.Repository.DeleteUser"
 
 	stmt, err := m.db.PrepareContext(ctx, deleteUserQuery)

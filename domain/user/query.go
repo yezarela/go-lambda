@@ -12,7 +12,7 @@ const listUserQuery = `
 	LIMIT %d OFFSET %d
 `
 
-const getUserQuery = `
+const GetUserQuery = `
 	SELECT 
 		id, 
 		name, 

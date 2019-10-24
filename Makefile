@@ -58,6 +58,11 @@ describe:
 		--profile ${PROFILE} \
 		--query 'Stacks[].Outputs[]'
 
+mocks:
+	@echo "\nGenerating mocks"
+	mockgen -source=domain/user/repository.go -destination=domain/user/mock/repository_mock.go # -mock_names IRepository=MockRepository
+	mockgen -source=domain/user/usecase.go -destination=domain/user/mock/usecase_mock.go # -mock_names IUsecase=MockUsecase
+
 publish: clean build deploy
 
 $(V).SILENT:

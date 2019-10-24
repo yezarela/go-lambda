@@ -65,10 +65,14 @@ make describe
 We use `testing` package that is built-in in Golang and you can simply run the following command to run our tests:
 
 ```shell
-go test -v ./hello-world/
+go test -v ./handlers/hello-world/
 ```
+For mocking purpose, we use `gomock` from Golang to help us to generate mock files quickly.
 
 ## Inspiration
 
 - [https://github.com/awslabs/serverless-application-model](https://github.com/awslabs/serverless-application-model)
 - [https://github.com/bxcodec/go-clean-arch](https://github.com/bxcodec/go-clean-arch)
+
+## TODO
+- Resource tagging

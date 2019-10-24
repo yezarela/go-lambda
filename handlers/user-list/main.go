@@ -13,7 +13,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var userUsecase *user.Usecase
+var userUsecase user.Usecase
 
 func init() {
 	db := conn.NewSQLConnection()

@@ -1,6 +1,7 @@
 package user
 
-const listUserQuery = `
+// ListUserQuery ...
+const ListUserQuery = `
 	SELECT 
 		id, 
 		name, 
@@ -12,6 +13,7 @@ const listUserQuery = `
 	LIMIT %d OFFSET %d
 `
 
+// GetUserQuery ...
 const GetUserQuery = `
 	SELECT 
 		id, 
@@ -23,7 +25,8 @@ const GetUserQuery = `
 	WHERE id = ?
 `
 
-const createUserQuery = `
+// CreateUserQuery ...
+const CreateUserQuery = `
 	INSERT INTO
 		user (
 			name,
@@ -34,7 +37,8 @@ const createUserQuery = `
 		( ? , ? , NOW() )
 `
 
-const updateUserQuery = `
+// UpdateUserQuery ...
+const UpdateUserQuery = `
 	UPDATE
 		user
 	SET
@@ -44,6 +48,7 @@ const updateUserQuery = `
 	WHERE id = ?		
 `
 
-const deleteUserQuery = `
+// DeleteUserQuery ...
+const DeleteUserQuery = `
 	DELETE FROM user WHERE id = ?
 `

@@ -86,7 +86,7 @@ func (m *repository) ListUser(ctx context.Context, param ListUserParams) ([]*mod
 		param.SortDirection = "DESC"
 	}
 
-	query := fmt.Sprintf(listUserQuery,
+	query := fmt.Sprintf(ListUserQuery,
 		param.SortBy,
 		param.SortDirection,
 		param.Limit,
@@ -121,7 +121,7 @@ func (m *repository) GetUser(ctx context.Context, id uint) (*models.User, error)
 func (m *repository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.User) (int64, error) {
 	op := "user.Repository.CreateUser"
 
-	stmt, err := tx.PrepareContext(ctx, createUserQuery)
+	stmt, err := tx.PrepareContext(ctx, CreateUserQuery)
 	if err != nil {
 		return -1, errors.Wrap(err, op)
 	}
@@ -142,7 +142,7 @@ func (m *repository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.User)
 func (m *repository) UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User) (*models.User, error) {
 	op := "user.Repository.UpdateUser"
 
-	stmt, err := tx.PrepareContext(ctx, updateUserQuery)
+	stmt, err := tx.PrepareContext(ctx, UpdateUserQuery)
 	if err != nil {
 		return nil, errors.Wrap(err, op)
 	}
@@ -163,7 +163,7 @@ func (m *repository) UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User)
 func (m *repository) DeleteUser(ctx context.Context, id uint) error {
 	op := "user.Repository.DeleteUser"
 
-	stmt, err := m.db.PrepareContext(ctx, deleteUserQuery)
+	stmt, err := m.db.PrepareContext(ctx, DeleteUserQuery)
 	if err != nil {
 		return errors.Wrap(err, op)
 	}

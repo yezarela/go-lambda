@@ -11,6 +11,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	user "github.com/yezarela/go-lambda/domain/user"
+	"github.com/yezarela/go-lambda/model"
 )
 
 // MockRepository is a mock of Repository interface

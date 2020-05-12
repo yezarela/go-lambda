@@ -10,6 +10,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	user "github.com/yezarela/go-lambda/domain/user"
+	"github.com/yezarela/go-lambda/model"
 )
 
 // MockUsecase is a mock of Usecase interface

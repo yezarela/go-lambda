@@ -7,10 +7,10 @@ package mock_user
 import (
 	context "context"
 	sql "database/sql"
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	user "github.com/yezarela/go-lambda/domain/user"
-	models "github.com/yezarela/go-lambda/models"
-	reflect "reflect"
 )
 
 // MockRepository is a mock of Repository interface
@@ -37,10 +37,10 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 }
 
 // ListUser mocks base method
-func (m *MockRepository) ListUser(ctx context.Context, p user.ListUserParams) ([]*models.User, error) {
+func (m *MockRepository) ListUser(ctx context.Context, p user.ListUserParams) ([]*model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListUser", ctx, p)
-	ret0, _ := ret[0].([]*models.User)
+	ret0, _ := ret[0].([]*model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -52,10 +52,10 @@ func (mr *MockRepositoryMockRecorder) ListUser(ctx, p interface{}) *gomock.Call 
 }
 
 // GetUser mocks base method
-func (m *MockRepository) GetUser(ctx context.Context, id uint) (*models.User, error) {
+func (m *MockRepository) GetUser(ctx context.Context, id uint) (*model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUser", ctx, id)
-	ret0, _ := ret[0].(*models.User)
+	ret0, _ := ret[0].(*model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -67,7 +67,7 @@ func (mr *MockRepositoryMockRecorder) GetUser(ctx, id interface{}) *gomock.Call 
 }
 
 // CreateUser mocks base method
-func (m *MockRepository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.User) (int64, error) {
+func (m *MockRepository) CreateUser(ctx context.Context, tx *sql.Tx, p *model.User) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, tx, p)
 	ret0, _ := ret[0].(int64)
@@ -82,10 +82,10 @@ func (mr *MockRepositoryMockRecorder) CreateUser(ctx, tx, p interface{}) *gomock
 }
 
 // UpdateUser mocks base method
-func (m *MockRepository) UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User) (*models.User, error) {
+func (m *MockRepository) UpdateUser(ctx context.Context, tx *sql.Tx, p *model.User) (*model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUser", ctx, tx, p)
-	ret0, _ := ret[0].(*models.User)
+	ret0, _ := ret[0].(*model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

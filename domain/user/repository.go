@@ -6,15 +6,15 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/yezarela/go-lambda/models"
+	"github.com/yezarela/go-lambda/model"
 )
 
 // Repository ...
 type Repository interface {
-	ListUser(ctx context.Context, p ListUserParams) ([]*models.User, error)
-	GetUser(ctx context.Context, id uint) (*models.User, error)
-	CreateUser(ctx context.Context, tx *sql.Tx, p *models.User) (int64, error)
-	UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User) (*models.User, error)
+	ListUser(ctx context.Context, p ListUserParams) ([]*model.User, error)
+	GetUser(ctx context.Context, id uint) (*model.User, error)
+	CreateUser(ctx context.Context, tx *sql.Tx, p *model.User) (int64, error)
+	UpdateUser(ctx context.Context, tx *sql.Tx, p *model.User) (*model.User, error)
 	DeleteUser(ctx context.Context, id uint) error
 }
 
@@ -27,7 +27,7 @@ func NewRepository(db *sql.DB) Repository {
 	return &repository{db}
 }
 
-func (m *repository) fetchUser(ctx context.Context, query string, args ...interface{}) ([]*models.User, error) {
+func (m *repository) fetchUser(ctx context.Context, query string, args ...interface{}) ([]*model.User, error) {
 	op := "user.Repository.fetchUser"
 
 	rows, err := m.db.QueryContext(ctx, query, args...)
@@ -36,9 +36,9 @@ func (m *repository) fetchUser(ctx context.Context, query string, args ...interf
 	}
 	defer rows.Close()
 
-	items := []*models.User{}
+	items := []*model.User{}
 	for rows.Next() {
-		s := models.UserScan{}
+		s := model.UserScan{}
 
 		err := rows.Scan(
 			&s.ID,
@@ -51,7 +51,7 @@ func (m *repository) fetchUser(ctx context.Context, query string, args ...interf
 			return nil, errors.Wrap(err, op)
 		}
 
-		data := &models.User{}
+		data := &model.User{}
 		data = data.FromScan(s)
 
 		items = append(items, data)
@@ -69,7 +69,7 @@ type ListUserParams struct {
 }
 
 // ListUser ...
-func (m *repository) ListUser(ctx context.Context, param ListUserParams) ([]*models.User, error) {
+func (m *repository) ListUser(ctx context.Context, param ListUserParams) ([]*model.User, error) {
 	op := "user.Repository.ListUser"
 
 	switch param.SortBy {
@@ -102,7 +102,7 @@ func (m *repository) ListUser(ctx context.Context, param ListUserParams) ([]*mod
 }
 
 // GetUser ...
-func (m *repository) GetUser(ctx context.Context, id uint) (*models.User, error) {
+func (m *repository) GetUser(ctx context.Context, id uint) (*model.User, error) {
 	op := "user.Repository.GetUser"
 
 	rows, err := m.fetchUser(ctx, GetUserQuery, id)
@@ -118,7 +118,7 @@ func (m *repository) GetUser(ctx context.Context, id uint) (*models.User, error)
 }
 
 // CreateUser ...
-func (m *repository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.User) (int64, error) {
+func (m *repository) CreateUser(ctx context.Context, tx *sql.Tx, p *model.User) (int64, error) {
 	op := "user.Repository.CreateUser"
 
 	stmt, err := tx.PrepareContext(ctx, CreateUserQuery)
@@ -139,7 +139,7 @@ func (m *repository) CreateUser(ctx context.Context, tx *sql.Tx, p *models.User)
 }
 
 // UpdateUser ...
-func (m *repository) UpdateUser(ctx context.Context, tx *sql.Tx, p *models.User) (*models.User, error) {
+func (m *repository) UpdateUser(ctx context.Context, tx *sql.Tx, p *model.User) (*model.User, error) {
 	op := "user.Repository.UpdateUser"
 
 	stmt, err := tx.PrepareContext(ctx, UpdateUserQuery)

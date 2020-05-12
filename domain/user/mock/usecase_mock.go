@@ -6,10 +6,10 @@ package mock_user
 
 import (
 	context "context"
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	user "github.com/yezarela/go-lambda/domain/user"
-	models "github.com/yezarela/go-lambda/models"
-	reflect "reflect"
 )
 
 // MockUsecase is a mock of Usecase interface
@@ -36,14 +36,14 @@ func (m *MockUsecase) EXPECT() *MockUsecaseMockRecorder {
 }
 
 // ListUser mocks base method
-func (m *MockUsecase) ListUser(ctx context.Context, p ...user.ListUserParams) ([]*models.User, error) {
+func (m *MockUsecase) ListUser(ctx context.Context, p ...user.ListUserParams) ([]*model.User, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx}
 	for _, a := range p {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListUser", varargs...)
-	ret0, _ := ret[0].([]*models.User)
+	ret0, _ := ret[0].([]*model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -56,10 +56,10 @@ func (mr *MockUsecaseMockRecorder) ListUser(ctx interface{}, p ...interface{}) *
 }
 
 // GetByID mocks base method
-func (m *MockUsecase) GetByID(ctx context.Context, id uint) (*models.User, error) {
+func (m *MockUsecase) GetByID(ctx context.Context, id uint) (*model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByID", ctx, id)
-	ret0, _ := ret[0].(*models.User)
+	ret0, _ := ret[0].(*model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -71,10 +71,10 @@ func (mr *MockUsecaseMockRecorder) GetByID(ctx, id interface{}) *gomock.Call {
 }
 
 // CreateUser mocks base method
-func (m *MockUsecase) CreateUser(ctx context.Context, p *models.User) (*models.User, error) {
+func (m *MockUsecase) CreateUser(ctx context.Context, p *model.User) (*model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, p)
-	ret0, _ := ret[0].(*models.User)
+	ret0, _ := ret[0].(*model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -86,10 +86,10 @@ func (mr *MockUsecaseMockRecorder) CreateUser(ctx, p interface{}) *gomock.Call {
 }
 
 // UpdateUser mocks base method
-func (m *MockUsecase) UpdateUser(ctx context.Context, p *models.User) (*models.User, error) {
+func (m *MockUsecase) UpdateUser(ctx context.Context, p *model.User) (*model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUser", ctx, p)
-	ret0, _ := ret[0].(*models.User)
+	ret0, _ := ret[0].(*model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

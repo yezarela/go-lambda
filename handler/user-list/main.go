@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/yezarela/go-lambda/domain/user"
-	"github.com/yezarela/go-lambda/models"
+	"github.com/yezarela/go-lambda/model"
 	"github.com/yezarela/go-lambda/pkg/conn"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -39,10 +39,10 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	// Get list of users
 	users, err := userUsecase.ListUser(ctx, param)
 	if err != nil {
-		return models.APIServerError(err)
+		return model.APIServerError(err)
 	}
 
-	return models.APIResponse(200, users)
+	return model.APIResponse(200, users)
 }
 
 func main() {

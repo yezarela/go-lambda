@@ -5,16 +5,16 @@ import (
 	"database/sql"
 
 	"github.com/pkg/errors"
-	"github.com/yezarela/go-lambda/models"
+	"github.com/yezarela/go-lambda/model"
 	"github.com/yezarela/go-lambda/pkg/tern"
 )
 
 // Usecase ...
 type Usecase interface {
-	ListUser(ctx context.Context, p ...ListUserParams) ([]*models.User, error)
-	GetByID(ctx context.Context, id uint) (*models.User, error)
-	CreateUser(ctx context.Context, p *models.User) (*models.User, error)
-	UpdateUser(ctx context.Context, p *models.User) (*models.User, error)
+	ListUser(ctx context.Context, p ...ListUserParams) ([]*model.User, error)
+	GetByID(ctx context.Context, id uint) (*model.User, error)
+	CreateUser(ctx context.Context, p *model.User) (*model.User, error)
+	UpdateUser(ctx context.Context, p *model.User) (*model.User, error)
 	DeleteUser(ctx context.Context, id uint) error
 }
 
@@ -32,7 +32,7 @@ func NewUsecase(db *sql.DB, r Repository) Usecase {
 }
 
 // ListUser ...
-func (m *usecase) ListUser(ctx context.Context, params ...ListUserParams) ([]*models.User, error) {
+func (m *usecase) ListUser(ctx context.Context, params ...ListUserParams) ([]*model.User, error) {
 	op := "user.Usecase.ListUser"
 
 	param := ListUserParams{
@@ -58,7 +58,7 @@ func (m *usecase) ListUser(ctx context.Context, params ...ListUserParams) ([]*mo
 }
 
 // GetByID ...
-func (m *usecase) GetByID(ctx context.Context, id uint) (*models.User, error) {
+func (m *usecase) GetByID(ctx context.Context, id uint) (*model.User, error) {
 	op := "user.Usecase.GetByID"
 
 	res, err := m.userRepo.GetUser(ctx, id)
@@ -70,7 +70,7 @@ func (m *usecase) GetByID(ctx context.Context, id uint) (*models.User, error) {
 }
 
 // CreateUser ...
-func (m *usecase) CreateUser(ctx context.Context, p *models.User) (*models.User, error) {
+func (m *usecase) CreateUser(ctx context.Context, p *model.User) (*model.User, error) {
 	op := "user.Usecase.CreateUser"
 
 	// Start transaction
@@ -100,7 +100,7 @@ func (m *usecase) CreateUser(ctx context.Context, p *models.User) (*models.User,
 }
 
 // UpdateUser ...
-func (m *usecase) UpdateUser(ctx context.Context, p *models.User) (*models.User, error) {
+func (m *usecase) UpdateUser(ctx context.Context, p *model.User) (*model.User, error) {
 	op := "user.Usecase.UpdateUser"
 
 	// Start transaction
@@ -133,7 +133,7 @@ func (m *usecase) DeleteUser(ctx context.Context, id uint) error {
 		return errors.Wrap(err, op)
 	}
 	if existedUser == nil {
-		return models.ErrNotFound
+		return model.ErrNotFound
 	}
 
 	return m.userRepo.DeleteUser(ctx, id)

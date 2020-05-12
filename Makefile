@@ -11,7 +11,7 @@ PARAMETERS=`cat env.${STAGE}`
 STACK_NAME=${PROJECT_NAME}-${STAGE}
 TEMPLATE_NAME=template.yaml
 
-handlers := $(shell find handlers -name \*main.go | awk -F'/' '{print $$2}')
+handlers := $(shell find handler -name \*main.go | awk -F'/' '{print $$2}')
 
 deps:
 	@echo "\nInstalling dependencies"
@@ -32,7 +32,7 @@ local:
 build: 
 	@echo "\nBuilding handlers"
 	@for handler in $(handlers) ; do \
-		GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ./bin/$$handler/$$handler ./handlers/$$handler ; \
+		GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ./bin/$$handler/$$handler ./handler/$$handler || exit 1; \
 	done
 
 deploy: 

@@ -9,16 +9,23 @@ Go architecture for AWS Lambda
 - [Docker installed](https://www.docker.com/community-edition)
 - [Golang](https://golang.org)
 
-This is a sample structure of a lambda function
+This is the explanation of our file structure:
 
 ```bash
 .
 ├── Makefile                    <-- Make to automate build
-├── README.md                   <-- Instructions file
-├── handlers
-│   └── hello-world             <-- Source code for a lambda function
-│       ├── main.go             <-- Lambda function code
-│       └── main_test.go        <-- Unit tests
+├── domain                      <-- All domains/entities belong here
+├── infra                       <-- All external framework/drivers for our app to run
+├── utils                       <-- Shared utilities
+├── user
+│   └── handler                     
+│       └── hello-world             <-- Source code for a lambda function
+│           ├── main.go             <-- Lambda function code
+│           └── main_test.go        <-- Unit tests
+│   └── repository 
+│       └── mysql_repository        <-- Repository for our db
+│   └── usecase 
+│       └── user_usecase            <-- Business rules
 └── template.yaml               <-- Cloudformation template
 ```
 
@@ -28,6 +35,7 @@ This is a sample structure of a lambda function
 
 ```shell
 make deps
+docker-compose up -d
 ```
 
 ### Building

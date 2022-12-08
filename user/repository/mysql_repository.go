@@ -1,33 +1,45 @@
-package user
+package repository
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
-	"github.com/yezarela/go-lambda/model"
+	"github.com/yezarela/go-lambda/domain"
 )
-
-// Repository ...
-type Repository interface {
-	ListUser(ctx context.Context, p ListUserParams) ([]*model.User, error)
-	GetUser(ctx context.Context, id uint) (*model.User, error)
-	CreateUser(ctx context.Context, tx *sql.Tx, p *model.User) (int64, error)
-	UpdateUser(ctx context.Context, tx *sql.Tx, p *model.User) (*model.User, error)
-	DeleteUser(ctx context.Context, id uint) error
-}
 
 type repository struct {
 	db *sql.DB
 }
 
-// NewRepository ...
-func NewRepository(db *sql.DB) Repository {
+// NewMysqlRepository ...
+func NewMysqlRepository(db *sql.DB) domain.UserRepository {
 	return &repository{db}
 }
 
-func (m *repository) fetchUser(ctx context.Context, query string, args ...interface{}) ([]*model.User, error) {
+type UserScan struct {
+	ID        sql.NullInt64
+	Name      sql.NullString
+	Email     sql.NullString
+	CreatedAt mysql.NullTime
+	UpdatedAt mysql.NullTime
+}
+
+func FromScan(s UserScan) *domain.User {
+	u := domain.User{}
+
+	u.ID = uint(s.ID.Int64)
+	u.Name = s.Name.String
+	u.Email = s.Email.String
+	u.CreatedAt = s.CreatedAt.Time
+	u.UpdatedAt = s.UpdatedAt.Time
+
+	return &u
+}
+
+func (m *repository) fetchUser(ctx context.Context, query string, args ...interface{}) ([]*domain.User, error) {
 	op := "user.Repository.fetchUser"
 
 	rows, err := m.db.QueryContext(ctx, query, args...)
@@ -36,9 +48,9 @@ func (m *repository) fetchUser(ctx context.Context, query string, args ...interf
 	}
 	defer rows.Close()
 
-	items := []*model.User{}
+	items := []*domain.User{}
 	for rows.Next() {
-		s := model.UserScan{}
+		s := UserScan{}
 
 		err := rows.Scan(
 			&s.ID,
@@ -51,8 +63,7 @@ func (m *repository) fetchUser(ctx context.Context, query string, args ...interf
 			return nil, errors.Wrap(err, op)
 		}
 
-		data := &model.User{}
-		data = data.FromScan(s)
+		data := FromScan(s)
 
 		items = append(items, data)
 	}
@@ -60,16 +71,8 @@ func (m *repository) fetchUser(ctx context.Context, query string, args ...interf
 	return items, nil
 }
 
-// ListUserParams ...
-type ListUserParams struct {
-	SortBy        string
-	SortDirection string
-	Limit         uint
-	Offset        uint
-}
-
 // ListUser ...
-func (m *repository) ListUser(ctx context.Context, param ListUserParams) ([]*model.User, error) {
+func (m *repository) ListUser(ctx context.Context, param domain.ListUserParams) ([]*domain.User, error) {
 	op := "user.Repository.ListUser"
 
 	switch param.SortBy {
@@ -102,7 +105,7 @@ func (m *repository) ListUser(ctx context.Context, param ListUserParams) ([]*mod
 }
 
 // GetUser ...
-func (m *repository) GetUser(ctx context.Context, id uint) (*model.User, error) {
+func (m *repository) GetUser(ctx context.Context, id uint) (*domain.User, error) {
 	op := "user.Repository.GetUser"
 
 	rows, err := m.fetchUser(ctx, GetUserQuery, id)
@@ -118,10 +121,10 @@ func (m *repository) GetUser(ctx context.Context, id uint) (*model.User, error) 
 }
 
 // CreateUser ...
-func (m *repository) CreateUser(ctx context.Context, tx *sql.Tx, p *model.User) (int64, error) {
+func (m *repository) CreateUser(ctx context.Context, p *domain.User) (int64, error) {
 	op := "user.Repository.CreateUser"
 
-	stmt, err := tx.PrepareContext(ctx, CreateUserQuery)
+	stmt, err := m.db.PrepareContext(ctx, CreateUserQuery)
 	if err != nil {
 		return -1, errors.Wrap(err, op)
 	}
@@ -139,10 +142,10 @@ func (m *repository) CreateUser(ctx context.Context, tx *sql.Tx, p *model.User) 
 }
 
 // UpdateUser ...
-func (m *repository) UpdateUser(ctx context.Context, tx *sql.Tx, p *model.User) (*model.User, error) {
+func (m *repository) UpdateUser(ctx context.Context, p *domain.User) (*domain.User, error) {
 	op := "user.Repository.UpdateUser"
 
-	stmt, err := tx.PrepareContext(ctx, UpdateUserQuery)
+	stmt, err := m.db.PrepareContext(ctx, UpdateUserQuery)
 	if err != nil {
 		return nil, errors.Wrap(err, op)
 	}

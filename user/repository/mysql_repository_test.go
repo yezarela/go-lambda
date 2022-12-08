@@ -1,6 +1,4 @@
-// +build test
-
-package user
+package repository
 
 import (
 	"context"
@@ -10,10 +8,9 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
-	"github.com/yezarela/go-lambda/domain/user"
 )
 
-func TestGetByID(t *testing.T) {
+func TestRepositoryGetByID(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -25,11 +22,11 @@ func TestGetByID(t *testing.T) {
 			NewRows([]string{"id", "name", "email", "created_at", "updated_at"}).
 			AddRow(1, "john", "john@doe.com", time.Now(), time.Now())
 
-		mock.ExpectQuery(user.GetUserQuery).
+		mock.ExpectQuery(GetUserQuery).
 			WithArgs(1).
 			WillReturnRows(rows)
 
-		repo := user.NewRepository(db)
+		repo := NewMysqlRepository(db)
 
 		res, err := repo.GetUser(context.Background(), uint(1))
 
@@ -45,9 +42,9 @@ func TestGetByID(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 
-		mock.ExpectQuery(user.GetUserQuery).WillReturnError(errors.New("some error"))
+		mock.ExpectQuery(GetUserQuery).WillReturnError(errors.New("some error"))
 
-		repo := user.NewRepository(db)
+		repo := NewMysqlRepository(db)
 
 		res, err := repo.GetUser(context.Background(), uint(5))
 

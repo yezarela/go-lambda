@@ -1,6 +1,4 @@
-// +build test
-
-package user
+package usecase
 
 import (
 	"context"
@@ -9,23 +7,22 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/yezarela/go-lambda/domain/user"
-	userMock "github.com/yezarela/go-lambda/domain/user/mock"
-	"github.com/yezarela/go-lambda/model"
+	"github.com/yezarela/go-lambda/domain"
+	mock_domain "github.com/yezarela/go-lambda/domain/mock"
 )
 
 func TestGetByID(t *testing.T) {
 	ctrl, ctx := gomock.WithContext(context.Background(), t)
 	defer ctrl.Finish()
 
-	mockUserRepo := userMock.NewMockRepository(ctrl)
-	mockUser := model.User{ID: 1}
+	mockUserRepo := mock_domain.NewMockUserRepository(ctrl)
+	mockUser := domain.User{ID: 1}
 
 	t.Run("Success", func(t *testing.T) {
 
 		mockUserRepo.EXPECT().GetUser(ctx, mockUser.ID).Return(&mockUser, nil)
 
-		usecase := user.NewUsecase(nil, mockUserRepo)
+		usecase := NewUsecase(mockUserRepo)
 
 		res, err := usecase.GetByID(ctx, mockUser.ID)
 
@@ -39,7 +36,7 @@ func TestGetByID(t *testing.T) {
 
 		mockUserRepo.EXPECT().GetUser(ctx, uint(12)).Return(nil, errors.New("noop"))
 
-		usecase := user.NewUsecase(nil, mockUserRepo)
+		usecase := NewUsecase(mockUserRepo)
 
 		res, err := usecase.GetByID(ctx, uint(12))
 

@@ -1,4 +1,4 @@
-package conn
+package database
 
 import (
 	"database/sql"
@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-// NewSQLConnection creates sql connection
-func NewSQLConnection() *sql.DB {
+// NewMySQLConnection creates mysql connection
+func NewMySQLConnection() *sql.DB {
 	dbDriver := os.Getenv("DBDriverName")
 	dbSource := os.Getenv("DBDataSourceName")
 

@@ -6,19 +6,21 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/yezarela/go-lambda/domain/user"
-	"github.com/yezarela/go-lambda/model"
-	"github.com/yezarela/go-lambda/pkg/conn"
+	"github.com/yezarela/go-lambda/domain"
+	"github.com/yezarela/go-lambda/infra/api"
+	"github.com/yezarela/go-lambda/infra/database"
+	_userRepo "github.com/yezarela/go-lambda/user/repository"
+	_userUsecase "github.com/yezarela/go-lambda/user/usecase"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var userUsecase user.Usecase
+var userUsecase domain.UserUsecase
 
 func init() {
-	db := conn.NewSQLConnection()
-	userRepo := user.NewRepository(db)
-	userUsecase = user.NewUsecase(db, userRepo)
+	db := database.NewMySQLConnection()
+	userRepo := _userRepo.NewMysqlRepository(db)
+	userUsecase = _userUsecase.NewUsecase(userRepo)
 }
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -29,7 +31,7 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	limit, _ := strconv.Atoi(qs["limit"])
 	offset, _ := strconv.Atoi(qs["offset"])
 
-	param := user.ListUserParams{
+	param := domain.ListUserParams{
 		Limit:         uint(limit),
 		Offset:        uint(offset),
 		SortBy:        qs["sort_by"],
@@ -39,10 +41,10 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	// Get list of users
 	users, err := userUsecase.ListUser(ctx, param)
 	if err != nil {
-		return model.APIServerError(err)
+		return api.APIServerError(err)
 	}
 
-	return model.APIResponse(200, users)
+	return api.APIResponse(200, users)
 }
 
 func main() {

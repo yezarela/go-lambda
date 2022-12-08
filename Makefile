@@ -11,7 +11,7 @@ PARAMETERS=`cat env.${STAGE}`
 STACK_NAME=${PROJECT_NAME}-${STAGE}
 TEMPLATE_NAME=template.yaml
 
-handlers := $(shell find handler -name \*main.go | awk -F'/' '{print $$2}')
+handlers := $(shell find . -name '*main.go')
 
 deps:
 	@echo "\nInstalling dependencies"
@@ -32,7 +32,8 @@ local:
 build: 
 	@echo "\nBuilding handlers"
 	@for handler in $(handlers) ; do \
-		GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ./bin/$$handler/$$handler ./handler/$$handler || exit 1; \
+		lambda_name=$$(echo $$handler | awk -F'/' '{print $$4}'); \
+		GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ./bin/$$lambda_name/$$lambda_name $$handler || exit 1; \
 	done
 
 deploy: 
@@ -60,8 +61,7 @@ describe:
 
 mocks:
 	@echo "\nGenerating mocks"
-	mockgen -source=domain/user/repository.go -destination=domain/user/mock/repository_mock.go # -mock_names IRepository=MockRepository
-	mockgen -source=domain/user/usecase.go -destination=domain/user/mock/usecase_mock.go # -mock_names IUsecase=MockUsecase
+	mockgen -source=domain/user.go -destination=domain/mock/user_mock.go # -mock_names Repository=MockRepository
 
 publish: clean build deploy
 

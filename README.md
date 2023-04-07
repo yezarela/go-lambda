@@ -13,20 +13,23 @@ This is the explanation of our file structure:
 
 ```bash
 .
-├── Makefile                    <-- Make to automate build
-├── domain                      <-- All domains/entities belong here
-├── infra                       <-- All external framework/drivers for our app to run
-├── utils                       <-- Shared utilities
-├── user
+├── domain                           <-- All domains/entities belong here
+├── user                             <-- Module directory
 │   └── handler                     
-│       └── hello-world             <-- Source code for a lambda function
-│           ├── main.go             <-- Lambda function code
-│           └── main_test.go        <-- Unit tests
+│       └── user-get                 <-- Source code for a lambda function
+│           ├── main.go              <-- Lambda function code
+│           └── main_test.go         <-- Unit tests
 │   └── repository 
-│       └── mysql_repository        <-- Repository for our db
+│       ├── mysql_repository.go      <-- Repository for our db
+│       └── mysql_repository_test.go <-- Unit tests
 │   └── usecase 
-│       └── user_usecase            <-- Business rules
-└── template.yaml               <-- Cloudformation template
+│       ├── user_usecase.go          <-- Business rules
+│       └── user_usecase_test.go     <-- Unit tests
+│
+├── infra                            <-- All external framework/drivers 
+├── utils                            <-- Shared utilities
+├── Makefile                         <-- Make to automate build
+└── template.yaml                    <-- Cloudformation template
 ```
 
 ## Setup process

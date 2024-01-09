@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"os"
 	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -15,13 +17,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var userUsecase domain.UserUsecase
-
-func init() {
-	db := database.NewMySQLConnection()
-	userRepo := _userRepo.NewMysqlRepository(db)
-	userUsecase = _userUsecase.NewUsecase(userRepo)
-}
+var (
+	db          *sql.DB
+	userRepo    domain.UserRepository
+	userUsecase domain.UserUsecase
+)
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
@@ -48,5 +48,9 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 }
 
 func main() {
+	db = database.NewMySQLConnection(os.Getenv("DBDataSourceName"))
+	userRepo = _userRepo.NewMysqlRepository(db)
+	userUsecase = _userUsecase.NewUsecase(userRepo)
+
 	lambda.Start(handler)
 }

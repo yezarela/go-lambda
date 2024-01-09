@@ -42,7 +42,7 @@ func TestRepositoryGetByID(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 
-		mock.ExpectQuery(GetUserQuery).WillReturnError(errors.New("some error"))
+		mock.ExpectQuery(GetUserQuery).WithArgs(5).WillReturnError(errors.New("some error"))
 
 		repo := NewMysqlRepository(db)
 

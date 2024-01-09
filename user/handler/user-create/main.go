@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -16,13 +18,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var userUsecase domain.UserUsecase
-
-func init() {
-	db := database.NewMySQLConnection()
-	userRepo := _userRepo.NewMysqlRepository(db)
-	userUsecase = _userUsecase.NewUsecase(userRepo)
-}
+var (
+	db          *sql.DB
+	userRepo    domain.UserRepository
+	userUsecase domain.UserUsecase
+)
 
 type params struct {
 	Name  string `json:"name" valid:"required"`
@@ -64,5 +64,9 @@ func handler(ctx context.Context, evt events.APIGatewayProxyRequest) (events.API
 }
 
 func main() {
+	db = database.NewMySQLConnection(os.Getenv("DBDataSourceName"))
+	userRepo = _userRepo.NewMysqlRepository(db)
+	userUsecase = _userUsecase.NewUsecase(userRepo)
+
 	lambda.Start(handler)
 }

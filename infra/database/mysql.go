@@ -4,15 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 )
 
 // NewMySQLConnection creates mysql connection
-func NewMySQLConnection() *sql.DB {
-	dbDriver := os.Getenv("DBDriverName")
-	dbSource := os.Getenv("DBDataSourceName")
-
-	db, err := sql.Open(dbDriver, dbSource)
+func NewMySQLConnection(dsn string) *sql.DB {
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		panic(err)
 	}
